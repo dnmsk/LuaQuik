@@ -32,6 +32,11 @@ StockProcessor = Class:new({
             cv[pi] = data
           end
           local minTime = data.lastChecked - pv.period * 2
+          for k, v in pairs(data.data) do
+            if k >= minTime then
+              data.data[k] = {}
+            end
+          end
           for i, v in pairs(cv.codes) do
             local trades = AllTradesContainer:Trades(v, date)
             for ti, tv in pairs(trades) do
@@ -40,11 +45,10 @@ StockProcessor = Class:new({
                 local dataPeriod = data.data[periodId]
                 if dataPeriod == nil then
                   dataPeriod = {}
-                  data.data[periodId] = dataPeriod
                 end
                 if data.lastChecked < tv.time then data.lastChecked = tv.time end
 
-                pv.groupFunc(v, dataPeriod, tv)
+                data.data[periodId] = pv.groupFunc(v, periodId, dataPeriod, tv)
               end
             end
           end

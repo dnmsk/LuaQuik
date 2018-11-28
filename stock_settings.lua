@@ -4,7 +4,10 @@ StockSettings = Class:new({
       SBER = 'SBER',
       SBERP = 'SBERP',
       GAZP = 'GAZP',
-      VTBR = 'VTBR'
+      VTBR = 'VTBR',
+      MGNT = 'MGNT',
+      AFLT = 'AFLT',
+      LKOH = 'LKOH'
     }
   end,
   Get = function(self)

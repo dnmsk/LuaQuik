@@ -21,12 +21,14 @@ function OnInit(path)
   })
 
   StockProcessor:Init({
-    SberBank = { 'SBER', 'SRZ8', 'SRH9', 'SRM9', 'SRU9' }
+    SberBank = { 'SBER', 'SRZ8', 'SRH9', 'SRM9', 'SRU9' },
+    Gazp = { 'GAZP', 'GZZ8', 'GZH9', 'GZM9', 'GZU9' },
+    Lkoh = { 'LKOH', 'LKZ8', 'LKH9', 'LKM9', 'LKU9' }
   })
   StockProcessor:SetProcessors({
     Volumes = Processors:Get('volumes', {
       period = 1000 * 100,--1 mins
-      groups = { SberBank = true },
+      groups = { SberBank = true, Gazp = true, Lkoh = true },
     })
   })
   IsRun = true
@@ -63,11 +65,11 @@ function Sandbox()
   StockProcessor:SetProcessors({
     Volumes = Processors:Get('volumes', {
       period = 1000 * 100,--1 mins
-      groups = { SberBank = true },
+      groups = { SberBank = true, Gazp = true, Lkoh = true },
     })
   })
   StockProcessor:Calculate()
-  local result = StockProcessor:Results('SberBank')
+  local result = StockProcessor:Results('Lkoh')
   local data = result.Volumes
   for k, v in ipairs(table.sortKeys(data)) do
     print(v..'='..table.tostring(data[v]))

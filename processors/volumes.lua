@@ -1,5 +1,5 @@
 Processors:Add('volumes', {
-  groupFunc = function(code, prevData, trade)
+  groupFunc = function(code, period, prevData, trade)
     trade = StockSettings:GetFixedTrade(code, trade)
     local volume = trade.qty
     local moneyTrade = trade.qty * trade.price;
@@ -7,9 +7,11 @@ Processors:Add('volumes', {
       moneyTrade = -moneyTrade
       volume = -volume
     end
-    prevData.money = (prevData.money or 0) + moneyTrade
-    prevData.volume = (prevData.volume or 0) + volume
-    prevData.time = trade.time
+    return {
+      money = (prevData.money or 0) + moneyTrade,
+      volume = (prevData.volume or 0) + volume,
+      time = period
+    }
   end,
   resFunc = function(prevValue, curValue)
     return {

@@ -1,9 +1,11 @@
 Trade = Class:new({
   new = function()end,
   FromQuik = function(self, trade)
+    local flags = trade.flags
+    if flags > 1024 then flags = flags - 1024 end
     local _trade = {
       trade_num = trade.trade_num,
-      flags = trade.flags - 1025, --0 - sell, 1 - buy
+      flags = flags - 1, --0 - sell, 1 - buy
       price = trade.price,
       qty = trade.qty,
       value = trade.value,
