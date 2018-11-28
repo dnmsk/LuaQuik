@@ -50,8 +50,16 @@ AllTradesContainer = Disposable:new({
       self.codes[code] = code
     end
   end,
-  Trades = function(self, code)
-    return self.container.trades[code]
+  Trades = function(self, code, date)
+    local trades = self.container.trades[code]
+    if date == nil then return trades end
+    local result = {}
+    for k, v in pairs(trades) do
+      if v.date == date then
+        result[k] = v
+      end
+    end
+    return result
   end,
   FlushBuffer = function(self)
     local buffer = self.container.buffer

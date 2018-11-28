@@ -1,6 +1,7 @@
 StockProcessor = Class:new({
   new = function(self)
     self.codeGroups = {}
+    self.codeGroupsResults = {}
     self.processors = {}
   end,
   Init = function(self, codeGroups)
@@ -20,7 +21,8 @@ StockProcessor = Class:new({
       }
     end
   end,
-  Calculate = function(self)
+  Calculate = function(self, date)
+    if date == nil then date = tonumber(os.date('%Y%m%d')) end
     for pi, pv in pairs(self.processors) do
       for ci, cv in pairs(self.codeGroups) do
         if pv.groups[ci] ~= nil then
@@ -31,7 +33,7 @@ StockProcessor = Class:new({
           end
           local minTime = data.lastChecked - pv.period * 2
           for i, v in pairs(cv.codes) do
-            local trades = AllTradesContainer:Trades(v)
+            local trades = AllTradesContainer:Trades(v, date)
             for ti, tv in pairs(trades) do
               if tv.time >= minTime then
                 local periodId = math.floor(tv.time / pv.period) * pv.period
@@ -53,21 +55,26 @@ StockProcessor = Class:new({
   end,
   Results = function(self, codeGroup)
     local groupResult = self.codeGroups[codeGroup]
-    local result = {}
-    for k, v in pairs(self.processors) do
-      local data = groupResult[k]
-      if data ~= nil then
-        local r = {}
-        local prevVal = {}
-        for ri, rv in ipairs(table.sortKeys(data.data)) do
-          local val = data.data[rv]
-          r[rv] = v.resFunc(prevVal, val)
-          prevVal = r[rv]
+    local r = self.codeGroupsResults[codeGroup]
+    if r == nil or os.difftime(os.time(), r.since) > 1 then
+      local result = {}
+      for k, v in pairs(self.processors) do
+        local data = groupResult[k]
+        if data ~= nil then
+          local r = {}
+          local prevVal = {}
+          for ri, rv in ipairs(table.sortKeys(data.data)) do
+            local val = data.data[rv]
+            r[rv] = v.resFunc(prevVal, val)
+            prevVal = r[rv]
+          end
+          result[k] = r
         end
-        result[k] = r
       end
+      r = { since = os.time(), data = result }
+      self.codeGroupsResults[codeGroup] = r
     end
-    return result
+    return r.data
   end,
 
 })
