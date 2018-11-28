@@ -5,24 +5,30 @@ AllTradesContainer = Disposable:new({
     self.container = { buffer = {}, trades = {} }
     self.codes = {}
   end,
-  fileName = function(self, code)
-    local outFilePostfix = '_'..os.date('%x'):gsub('/', '-')..'.csv'
+  fileName = function(self, code, date)
+    if date == nil then
+      date = os.date('%Y%m%d')
+    end
+    local outFilePostfix = '_'..date..'.csv'
     return _app_path..'trades/'..code..'_'..outFilePostfix
   end,
-  Init = function(self, codes)
+  Init = function(self, codes, dates)
     self:dispose(self)
     self.container = { buffer = {}, trades = {} }
+    if dates == nil then dates = { os.date('%Y%m%d') } end
     for i, v in ipairs(codes) do
       self.codes[v] = v
-      local file = io.open(self:fileName(v), "r")
       local lines = {}
-      if file ~= nil then
-        for line in file:lines() do
-          local trade = Trade:FromString(line)
-          trade['saved'] = true
-          lines[trade.trade_num] = trade
+      for di, dv in ipairs(dates) do
+        local file = io.open(self:fileName(v, dv), "r")
+        if file ~= nil then
+          for line in file:lines() do
+            local trade = Trade:FromString(line, dv)
+            trade['saved'] = true
+            lines[trade.trade_num] = trade
+          end
+          file:close()
         end
-        file:close()
       end
       self.container.trades[v] = lines
     end
@@ -54,16 +60,24 @@ AllTradesContainer = Disposable:new({
     for i, v in pairs(self.codes) do
       local buff = buffer[i]
       if buff ~= nil then
-        local file = io.open(self:fileName(v), "a+")
+        local files = {}
         for bi, bv in pairs(buff) do
           local trade = self.container.trades[i][bv.trade_num]
           if trade['saved'] ~= true then
+            local fileName = self:fileName(v, trade.date)
+            local file = files[fileName]
+            if file == nil then
+              file = io.open(fileName, "a+")
+              files[fileName] = file
+            end
             trade['saved'] = true
             file:write(Trade:ToString(bv)..'\n')
           end
         end
-        file:flush()
-        file:close()
+        for fi, fv in pairs(files) do
+          fv:flush()
+          fv:close()
+        end
       end
     end
   end,

@@ -154,7 +154,16 @@ function table.tostring( tbl )
         table.key_to_str( k ) .. "=" .. table.val_to_str( v ) )
     end
   end
-  return "{" .. table.concat( result, "," ) .. "}"
+  return "{\n" .. table.concat( result, ",\n" ) .. "}"
+end
+
+function table.sortKeys(tbl)
+  local tkeys = {}
+
+  for k in pairs(tbl) do table.insert(tkeys, k) end
+
+  table.sort(tkeys)
+  return tkeys
 end
 
 -- удаление точки и нулей после нее
