@@ -111,3 +111,14 @@ function removeZero(str)
     end 
     return str
 end
+
+dofile(_app_path..'all_trades_container.lua')
+dofile(_app_path..'stock_processor.lua')
+dofile(_app_path..'stock_settings.lua')
+if getScriptPath == nil then
+  dofile(_app_path..'./processors/index.lua')
+  dofile(_app_path..'./tables/index.lua')
+else
+  dofile(_app_path..'processors\\index.lua')
+  dofile(_app_path..'tables\\index.lua')
+end

@@ -18,8 +18,8 @@ AllTradesContainer = Disposable:new({
     if dates == nil then dates = { os.date('%Y%m%d') } end
     for i, v in ipairs(codes) do
       self.codes[v] = v
-      local lines = {}
       for di, dv in ipairs(dates) do
+        local lines = {}
         local file = io.open(self:fileName(v, dv), "r")
         if file ~= nil then
           for line in file:lines() do
@@ -29,21 +29,31 @@ AllTradesContainer = Disposable:new({
           end
           file:close()
         end
+        local trades = self.container.trades[v]
+        if trades == nil then
+          trades = {}
+          self.container.trades[v] = trades
+        end
+        trades[tonumber(dv)] = lines
       end
-      self.container.trades[v] = lines
     end
   end,
   PushTrade = function(self, code, trade)
     if self.codes[code] == nil then return end
     local _trade = Trade:FromQuik(trade)
-    for i, v in pairs(self.container) do
+    for k, v in pairs(self.container) do
       local buffer = v[code]
       if buffer == nil then
-        v[code] = {}
-        buffer = v[code]
+        buffer = {}
+        v[code] = buffer
       end
-      if buffer[_trade.trade_num] == nil then
-        buffer[_trade.trade_num] = _trade
+      local _buffer = buffer[_trade.date]
+      if _buffer == nil then
+        _buffer = {}
+        buffer[_trade.date] = _buffer
+      end
+      if _buffer[_trade.trade_num] == nil then
+        _buffer[_trade.trade_num] = _trade
       end
     end
     if self.codes[code] ~= nil then
@@ -53,13 +63,8 @@ AllTradesContainer = Disposable:new({
   Trades = function(self, code, date)
     local trades = self.container.trades[code]
     if date == nil then return trades end
-    local result = {}
-    for k, v in pairs(trades) do
-      if v.date == date then
-        result[k] = v
-      end
-    end
-    return result
+    trades = trades[tonumber(date)] or {}
+    return trades
   end,
   FlushBuffer = function(self)
     local buffer = self.container.buffer
@@ -70,16 +75,18 @@ AllTradesContainer = Disposable:new({
       if buff ~= nil then
         local files = {}
         for bi, bv in pairs(buff) do
-          local trade = self.container.trades[i][bv.trade_num]
-          if trade['saved'] ~= true then
-            local fileName = self:fileName(v, trade.date)
-            local file = files[fileName]
-            if file == nil then
-              file = io.open(fileName, "a+")
-              files[fileName] = file
+          for ti, tv in pairs(bv) do
+            local trade = self.container.trades[i][bi][tv.trade_num]
+            if trade['saved'] ~= true then
+              local fileName = self:fileName(v, trade.date)
+              local file = files[fileName]
+              if file == nil then
+                file = io.open(fileName, "a+")
+                files[fileName] = file
+              end
+              trade['saved'] = true
+              file:write(Trade:ToString(tv)..'\n')
             end
-            trade['saved'] = true
-            file:write(Trade:ToString(bv)..'\n')
           end
         end
         for fi, fv in pairs(files) do

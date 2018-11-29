@@ -31,7 +31,7 @@ StockProcessor = Class:new({
             data = { data = {}, lastChecked = 0 }
             cv[pi] = data
           end
-          local minTime = data.lastChecked - pv.period * 2
+          local minTime = math.floor((data.lastChecked - pv.period * 2) / pv.period) * pv.period
           for k, v in pairs(data.data) do
             if k >= minTime then
               data.data[k] = {}
@@ -43,9 +43,7 @@ StockProcessor = Class:new({
               if tv.time >= minTime then
                 local periodId = math.floor(tv.time / pv.period) * pv.period
                 local dataPeriod = data.data[periodId]
-                if dataPeriod == nil then
-                  dataPeriod = {}
-                end
+                if dataPeriod == nil then dataPeriod = {} end
                 if data.lastChecked < tv.time then data.lastChecked = tv.time end
 
                 data.data[periodId] = pv.groupFunc(v, periodId, dataPeriod, tv)

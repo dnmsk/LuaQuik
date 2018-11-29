@@ -14,15 +14,16 @@ Tables = Disposable:new({
     return tbl
   end,
 
-  Create = function(self, name, columns)
-    local tbl = self:Find(self, name)
+  Create = function(self, name, columns, conf)
+    if conf == nil then conf = {} end
+    local tbl = self:Find(name)
     tbl.columns = columns
     for i, v in ipairs(columns) do
       local colId = AddColumn(tbl.id, i, v.name, v.default, v.type, v.width)
     end
     tbl.window = CreateWindow(tbl.id)
     SetWindowCaption(tbl.id, name)
-    SetWindowPos(tbl.id, 90, 60, 600, 400)
+    SetWindowPos(tbl.id, 90, 60, conf.width or 600, conf.height or 400)
   end,
 
   Update = function(self)
