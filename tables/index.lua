@@ -23,7 +23,7 @@ Tables = Disposable:new({
     end
     tbl.window = CreateWindow(tbl.id)
     SetWindowCaption(tbl.id, name)
-    SetWindowPos(tbl.id, 90, 60, conf.width or 600, conf.height or 400)
+    SetWindowPos(tbl.id, conf.posX or 90, conf.posY or 60, conf.width or 600, conf.height or 400)
   end,
 
   Update = function(self)
