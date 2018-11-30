@@ -101,6 +101,15 @@ function table.sortKeys(tbl)
   return tkeys
 end
 
+function table.average(tbl)
+  if #tbl == 0 then return 0 end
+  local sum = 0
+  for i in ipairs(tbl) do
+    sum = sum + tbl[i]
+  end
+  return sum / #tbl
+end
+
 -- удаление точки и нулей после нее
 function removeZero(str)
     while (string.sub(str,-1) == "0" and str ~= "0") do

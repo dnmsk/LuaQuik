@@ -50,7 +50,7 @@ function Sandbox()
       groups = StockCodes,
     })
   })
-  StockProcessor:Calculate()
+  StockProcessor:Calculate('20181129')
   local result = StockProcessor:Results('SBER')
   local data = result.Volumes
   for k, v in ipairs(table.sortKeys(data)) do
