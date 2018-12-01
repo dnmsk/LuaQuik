@@ -1,13 +1,14 @@
-function inheritsFrom( baseClass )
+function inheritsFrom( baseClass, static )
+  static = static or {}
   local new_class = {}
   local class_mt = { __index = new_class }
 
-  function new_class:new(hash)
-    local newinst = hash or {}
-    setmetatable(newinst, class_mt)
-    if newinst.new then
-      newinst.new(newinst)
+  function new_class.new(...)
+    local newinst = {}
+    if static.new ~= nil then
+      static.new(newinst, ...)
     end
+    setmetatable(newinst, class_mt)
     return newinst
   end
   if baseClass then
@@ -16,7 +17,7 @@ function inheritsFrom( baseClass )
   return new_class
 end
 
-Object = {}
+Object = { _Type = 'object' }
 Class = inheritsFrom(Object)
 Disposable = inheritsFrom(Class)
 
@@ -24,7 +25,7 @@ function Disposable:dispose()
   self.dispose(self)
 end
 
-Logs = Disposable:new({
+Logs = Disposable.new({
   new = function(self)
     self.logFiles = {}
   end,
@@ -62,24 +63,6 @@ function split(inputstr, sep)
     t[#t+1] = str
   end
   return t
-end
-
-function from_json(str)
-    local status, msg= pcall(json.decode, str, 1, json.null) -- dkjson
-    if status then
-        return msg
-    else
-        return nil, msg
-    end
-end
-
-function to_json(msg)
-    local status, str= pcall(json.encode, msg, { indent = false }) -- dkjson
-    if status then
-        return str
-    else
-        error(str)
-    end
 end
 
 function table.val_to_str ( v )
@@ -161,12 +144,10 @@ function DoFiles(files)
     else
       dofile(_app_path..start..table.concat(files[i], delim))
     end
-
   end
 end
 
 DoFiles({
   { 'stock_settings.lua' },
-  { 'common', 'objects', 'index.lua' },
   { 'external_connector', 'index.lua' },
 })

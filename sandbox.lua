@@ -6,26 +6,33 @@ else
   dofile(_app_path..'common/index.lua')
 end
 
-function main()
-  local client = require('external_connector/index').redis
+function main1()
+  local Indicator = require('common/objects/indicator')
+  local indicator = Indicator.new('Volumes', { key = 'value11' })
+  local RedisInteraction = require('services/redis_interaction')
+  local redis_interaction = RedisInteraction.new()
+  local requestResult = redis_interaction.Request(indicator)
+  print(requestResult)
+  redis_interaction:addWatch(indicator, function(_indicator)
+    print('watch__'.._indicator:ToString())
+    return Indicator.new('Volumes', { key = 'response_'.._indicator.data.key })
+  end)
+  redis_interaction:watch(indicator)
+  requestResult = redis_interaction.Request(indicator)
+  print(table.tostring(requestResult))
+  print(table.tostring(indicator))
 
-  local t = os.time()
-
-  local nrk = '--'
-  local nobody = '--'
-  local loops = 10000
-  for i=1, loops do
-    client:set('usr:nrk', 10)
-    client:set('usr:nobody', 5)
-    nrk = client:get('usr:nrk') 
-    nobody = client:get('usr:nobody') 
-  end
-
-  Logs:Write('Sandbox', nrk)
-  Logs:Write('Sandbox', nobody)
-  local diff = os.difftime(os.time(), t)
-  Logs:Write('Sandbox', diff)
-  Logs:Write('Sandbox', diff/loops)
 end
 
-if getScriptPath == nil then main() end
+function main()
+  local client = require('external_connector/index').redis
+  local keys = client:keys('*')
+  print(table.tostring(keys))
+  print(client:get('QUIK:Indicator:Request:Volumes'))
+end
+
+if getScriptPath == nil then main1() end
+main()
+--QUIK:Indicator:Request:*
+--QUIK:Indicator:Request:Volumes
+--QUIK:Indicator:Request:Volumes

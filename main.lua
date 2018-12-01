@@ -14,7 +14,6 @@ DoFiles({
 })
 
 function OnInit(path)
-  Logs:Write('LuaVersion', _VERSION)
   local codesArray = {}
   for k, v in pairs(StockCodes) do
     for _, cv in ipairs(v) do codesArray[#codesArray+1] = cv end
