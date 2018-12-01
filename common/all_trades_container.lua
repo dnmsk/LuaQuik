@@ -1,4 +1,8 @@
-dofile(_app_path..'trade.lua')
+if getScriptPath then
+  dofile(_app_path..'common\\trade.lua')
+else
+  dofile('./common/trade.lua')
+end
 
 AllTradesContainer = Disposable:new({
   new = function(self)
@@ -63,7 +67,15 @@ AllTradesContainer = Disposable:new({
   Trades = function(self, code, date)
     local trades = self.container.trades[code]
     if date == nil then return trades end
-    trades = trades[tonumber(date)] or {}
+    if trades == nil then
+      self:Init({ code })
+      trades = self.container.trades[code]
+    end
+    trades = trades[tonumber(date)]
+    if trades == nil then
+      self:Init({ code }, { date })
+      trades = self.container.trades[code][tonumber(date)]
+    end
     return trades
   end,
   FlushBuffer = function(self)

@@ -1,3 +1,5 @@
+DoFiles({{ 'common', 'stock_processor.lua' }})
+
 Processors = Class:new({
   new = function(self)
     self.container = {}
@@ -20,9 +22,5 @@ Processors = Class:new({
 for i, v in ipairs({
   'volumes'
 }) do
-  if getScriptPath == nil then
-    dofile(_app_path..'./processors/'..v..'.lua')
-  else
-    dofile(_app_path..'processors\\'..v..'.lua')
-  end
+  DoFiles({{ 'processors', v..'.lua' }})
 end

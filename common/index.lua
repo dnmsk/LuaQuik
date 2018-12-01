@@ -29,7 +29,7 @@ Logs = Disposable:new({
     self.logFiles = {}
   end,
   Write = function(self, logName, msg)
-    local logFilePath = _app_path..'logs/'..logName..'_'..os.date('%x'):gsub('/', '-')..'.txt'
+    local logFilePath = _app_path..'logs/'..logName..'_'..os.date('%x'):gsub('/', '-')..'.log'
     local logFile = self.logFiles[logFilePath]
     if logFile == nil then
       logFile = io.open(logFilePath, "a+")
@@ -44,6 +44,14 @@ Logs = Disposable:new({
   end
 })
 
+--- Sleep that always works
+function delay(msec)
+    if sleep then
+        pcall(sleep, msec)
+    else
+        pcall(socket.select, nil, nil, msec / 1000)
+    end
+end
 
 function split(inputstr, sep)
   if sep == nil then
@@ -54,6 +62,24 @@ function split(inputstr, sep)
     t[#t+1] = str
   end
   return t
+end
+
+function from_json(str)
+    local status, msg= pcall(json.decode, str, 1, json.null) -- dkjson
+    if status then
+        return msg
+    else
+        return nil, msg
+    end
+end
+
+function to_json(msg)
+    local status, str= pcall(json.encode, msg, { indent = false }) -- dkjson
+    if status then
+        return str
+    else
+        error(str)
+    end
 end
 
 function table.val_to_str ( v )
@@ -110,7 +136,7 @@ function table.average(tbl)
   return sum / #tbl
 end
 
--- удаление точки и нулей после нее
+-- СѓРґР°Р»РµРЅРёРµ С‚РѕС‡РєРё Рё РЅСѓР»РµР№ РїРѕСЃР»Рµ РЅРµРµ
 function removeZero(str)
     while (string.sub(str,-1) == "0" and str ~= "0") do
     str = string.sub(str,1,-2)
@@ -121,13 +147,26 @@ function removeZero(str)
     return str
 end
 
-dofile(_app_path..'all_trades_container.lua')
-dofile(_app_path..'stock_processor.lua')
-dofile(_app_path..'stock_settings.lua')
-if getScriptPath == nil then
-  dofile(_app_path..'./processors/index.lua')
-  dofile(_app_path..'./tables/index.lua')
-else
-  dofile(_app_path..'processors\\index.lua')
-  dofile(_app_path..'tables\\index.lua')
+function DoFiles(files)
+  local start = './'
+  local delim = '/'
+  if getScriptPath ~= nil then
+    start = ''
+    delim = '\\'
+  end
+  for i in ipairs(files) do
+    local file = files[i]
+    if #file == 1 then
+      dofile(_app_path..file[#file])
+    else
+      dofile(_app_path..start..table.concat(files[i], delim))
+    end
+
+  end
 end
+
+DoFiles({
+  { 'stock_settings.lua' },
+  { 'common', 'objects', 'index.lua' },
+  { 'external_connector', 'index.lua' },
+})

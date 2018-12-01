@@ -10,7 +10,7 @@
     MGNT = 7
   }
   local width = 272
-  local CreateTable = function(code)
+  local AppendTable = function(code)
     local valGetter = function(field)
       return function()
         local results = StockProcessor:Results(code).Volumes
@@ -28,7 +28,7 @@
       { name = 'Delta', default = true, type = QTABLE_DOUBLE_TYPE, width = 11, values = valGetter('moneyDelta') },
       { name = 'Price', default = true, type = QTABLE_DOUBLE_TYPE, width = 7, values = valGetter('price') },
     }
-    Tables:Create(
+    Tables:Append(
       code,
       colums,
       { height = 850, width = width, posX = (positions[code] or 6) * width, posY = 0 }
@@ -36,6 +36,6 @@
   end
 
   for k, v in pairs(StockCodes) do
-    CreateTable(k)
+    AppendTable(k)
   end
 end)()

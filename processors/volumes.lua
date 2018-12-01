@@ -34,21 +34,31 @@ Processors:Add('volumes', {
     }
   end,
   resFunc = function(prevValue, curValue)
-    local stock = prevValue.stock or { volume = 0 }
-    local futures = prevValue.futures or { volume = 0 }
+    local stock = prevValue.stock or {}
+    local futures = prevValue.futures or {}
+    stock = { volume = stock.volume or 0, needSpent = stock.spent or 0 }
+    futures = { volume = futures.volume or 0, needSpent = futures.spent or 0 }
     stock.volume = stock.volume + curValue.stock.volume
     futures.volume = futures.volume + curValue.futures.volume
-    local needSpent = (prevValue.needSpent or 0) + math.floor(
-      table.average(curValue.stock.prices) * stock.volume +
-      table.average(curValue.futures.prices) * futures.volume
-    )
+    local needSpentStock = table.average(curValue.stock.prices) * stock.volume
+    local needSpentFutures = table.average(curValue.futures.prices) * futures.volume
+    if needSpentStock == 0 then
+      needSpentStock = stock.needSpent or 0
+    end
+    if needSpentFutures == 0 then
+      needSpentFutures = futures.needSpent or 0
+    end
+    local needSpent = math.floor(needSpentStock + needSpentFutures)
+    stock.needSpent = needSpentStock
+    futures.needSpent = needSpentFutures
     local volume = (prevValue.volume or 0) + curValue.stock.volume + curValue.futures.volume
     local spent = math.floor((prevValue.spent or 0) + curValue.stock.spent + curValue.futures.spent)
     return {
       spent = spent,
-      needSpent = needSpent,
       moneyDelta = needSpent - spent,
-      volume = (prevValue.volume or 0) + stock.volume + futures.volume,
+      stock = stock,
+      futures = futures,
+      volume = stock.volume + futures.volume,
       time = math.floor(curValue.time / 100000),
       price = curValue.stock.prices[#curValue.stock.prices] or table.average(curValue.futures.prices)
     }

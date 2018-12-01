@@ -1,8 +1,7 @@
-if getScriptPath == nil then return end
-
 Tables = Disposable:new({
   new = function(self)
     self.tables = {}
+    self.needCreate = {}
   end,
 
   Find = function(self, name)
@@ -14,16 +13,26 @@ Tables = Disposable:new({
     return tbl
   end,
 
-  Create = function(self, name, columns, conf)
-    if conf == nil then conf = {} end
-    local tbl = self:Find(name)
-    tbl.columns = columns
-    for i, v in ipairs(columns) do
-      local colId = AddColumn(tbl.id, i, v.name, v.default, v.type, v.width)
+  Append = function(self, name, columns, conf)
+    if self.tables.name == nil then
+      self.needCreate[name] = { columns = columns, conf = conf or {} }
     end
-    tbl.window = CreateWindow(tbl.id)
-    SetWindowCaption(tbl.id, name)
-    SetWindowPos(tbl.id, conf.posX or 90, conf.posY or 60, conf.width or 600, conf.height or 400)
+  end,
+
+  Create = function(self)
+    local tbls = self.needCreate
+    self.needCreate = {}
+
+    for k, v in pairs(tbls) do
+      local tbl = self:Find(k)
+      tbl.columns = v.columns
+      for i, v in ipairs(v.columns) do
+        local colId = AddColumn(tbl.id, i, v.name, v.default, v.type, v.width)
+      end
+      tbl.window = CreateWindow(tbl.id)
+      SetWindowCaption(tbl.id, k)
+      SetWindowPos(tbl.id, v.conf.posX or 90, v.conf.posY or 60, v.conf.width or 600, v.conf.height or 400)
+    end
   end,
 
   Update = function(self)
@@ -54,9 +63,5 @@ Tables = Disposable:new({
 for i, v in ipairs({
   'volumes'
 }) do
-  if getScriptPath == nil then
-    dofile(_app_path..'./tables/'..v..'.lua')
-  else
-    dofile(_app_path..'tables\\'..v..'.lua')
-  end
+  DoFiles({{ 'tables', v..'.lua' }})
 end
