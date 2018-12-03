@@ -22,24 +22,28 @@ function AllTradesContainer:Init(codes, dates)
   for i, v in ipairs(codes) do
     self.codes[v] = v
     for di, dv in ipairs(dates) do
-      local lines = {}
-      local file = io.open(self:fileName(v, dv), "r")
-      if file ~= nil then
-        for line in file:lines() do
-          local trade = _Trade.FromString(line, dv)
-          trade['saved'] = true
-          lines[trade.trade_num] = trade
-        end
-        file:close()
-      end
       local trades = self.container.trades[v]
       if trades == nil then
         trades = {}
         self.container.trades[v] = trades
       end
-      trades[tonumber(dv)] = lines
+      trades[tonumber(dv)] = self:ReadTradesForDate(v, dv)
     end
   end
+end
+
+function AllTradesContainer:ReadTradesForDate(code, date)
+  local lines = {}
+  local file = io.open(self:fileName(code, date), "r")
+  if file ~= nil then
+    for line in file:lines() do
+      local trade = _Trade.FromString(line, date)
+      trade['saved'] = true
+      lines[trade.trade_num] = trade
+    end
+    file:close()
+  end
+  return lines
 end
 
 function AllTradesContainer:PushTrade(code, trade)
@@ -65,7 +69,7 @@ function AllTradesContainer:PushTrade(code, trade)
   end
 end
 
-function AllTradesContainer:Trades(code, date)
+function AllTradesContainer:Trades(code, date, keepInCache)
   local trades = self.container.trades[code]
   if date == nil then return trades end
   if trades == nil then
@@ -73,9 +77,11 @@ function AllTradesContainer:Trades(code, date)
     trades = self.container.trades[code]
   end
   trades = trades[tonumber(date)]
-  if trades == nil then
+  if trades == nil and keepInCache ~= nil then
     self:Init({ code }, { date })
     trades = self.container.trades[code][tonumber(date)]
+  else
+    trades = self:ReadTradesForDate(code, date)
   end
   return trades
 end

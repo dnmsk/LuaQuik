@@ -35,7 +35,7 @@ function StockProcessor:Calculate(date)
           data = { data = {}, lastChecked = 0 }
           cv[pi] = data
         end
-        local minTime = math.floor((data.lastChecked - pv.period * 2) / pv.period) * pv.period
+        local minTime = math.floor(data.lastChecked - pv.period:DateTimeNumber() * 4)
         for k, v in pairs(data.data) do
           if k >= minTime then
             data.data[k] = {}
@@ -44,8 +44,9 @@ function StockProcessor:Calculate(date)
         for i, v in pairs(cv.codes) do
           local trades = AllTradesContainer:Trades(v, date)
           for ti, tv in pairs(trades) do
-            if tv.time >= minTime or tv.time > data.lastChecked then
-              local periodId = math.floor(tv.time / pv.period) * pv.period
+            local tradeTime = tv.datetime:DateTimeNumber()
+            if tradeTime >= minTime or tradeTime > data.lastChecked then
+              local periodId = tv.datetime:PeriodId(pv.period)
               local dataPeriod = data.data[periodId]
               if dataPeriod == nil then dataPeriod = {} end
 
@@ -62,7 +63,7 @@ end
 function StockProcessor:Results(codeGroup)
   local groupResult = self.codeGroups[codeGroup]
   local r = self.codeGroupsResults[codeGroup]
-  if r == nil or os.difftime(os.time(), r.since) > 1 then
+  if r == nil or os.difftime(os.time(), r.since) >= 1 then
     local result = {}
     for k, v in pairs(self.processors) do
       local data = groupResult[k]
@@ -82,3 +83,5 @@ function StockProcessor:Results(codeGroup)
   end
   return r.data
 end
+
+return StockProcessor

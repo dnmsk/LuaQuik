@@ -1,10 +1,8 @@
-DoFiles({{ 'processors', 'stock_processor.lua' }})
-
-Processors = (inheritsFrom(Class, {
+local Processors = inheritsFrom(Class, {
   new = function(self)
     self.container = {}
   end
-})).new()
+}).new()
 
 function Processors:Add(name, func)
   -- func = { groupFunc: ->(){}, resFunc: ->(){} }
@@ -27,3 +25,5 @@ for i, v in ipairs({
   local processor = require('processors/'..v)
   Processors:Add(v, processor)
 end
+
+return Processors

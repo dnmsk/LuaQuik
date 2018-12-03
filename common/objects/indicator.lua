@@ -15,20 +15,28 @@ end
 
 function Indicator.FromString(strData)
   local parts = split(strData, ';')
+  return Indicator.new(parts[1], Indicator.Deserilaize(parts[2]))
+end
+
+function Indicator.Deserilaize(strData)
   local data = {}
-  for i, v in ipairs(split(parts[2], '|')) do
+  for i, v in ipairs(split(strData, '|')) do
     local parts = split(v, ':')
     data[parts[1]] = parts[2]
   end
-  return Indicator.new(parts[1], data)
+  return data
+end
+
+function Indicator.Serialize(tbl)
+  local _pairs = {}
+  for k, v in pairs(tbl) do
+    _pairs[#_pairs+1] = k..':'..v
+  end
+  return table.concat(_pairs, '|')
 end
 
 function Indicator:ToString()
-  local _pairs = {};
-  for k, v in pairs(self.data) do
-    _pairs[#_pairs+1] = k..':'..v
-  end
-  return table.concat({ self.name, table.concat(_pairs, '|') }, ';')
+  return table.concat({ self.name, Indicator.Serialize(self.data) }, ';')
 end
 
 return Indicator

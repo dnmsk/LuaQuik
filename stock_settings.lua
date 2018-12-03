@@ -1,12 +1,12 @@
 StockCodes = {
-  SBER =  { 'SBER', 'SRZ8', 'SRH9', 'SRM9', 'SRU9' },
-  SBERP = { 'SBERP', 'SPZ8', 'SPH9', 'SPM9', 'SPU9' },
-  GAZP =  { 'GAZP', 'GZZ8', 'GZH9', 'GZM9', 'GZU9' },
-  LKOH =  { 'LKOH', 'LKZ8', 'LKH9', 'LKM9', 'LKU9' },
-  VTBR =  { 'VTBR', 'VBZ8', 'VBH9', 'VBM9', 'VBU9' },
-  AFLT =  { 'AFLT', 'AFZ8', 'AFH9', 'AFM9', 'AFU9' },
-  MGNT =  { 'MGNT', 'MNZ8', 'MNH9', 'MNM9', 'MNU9' },
-  RTS =   {         'RIZ8', 'RIH9', 'RIM9', 'RIU9' }
+  SBER  = { 'SBER', 'SRZ8', 'SRH9', 'SRM9', 'SRU9' },
+  SBERP = {'SBERP', 'SPZ8', 'SPH9', 'SPM9', 'SPU9' },
+  GAZP  = { 'GAZP', 'GZZ8', 'GZH9', 'GZM9', 'GZU9' },
+  LKOH  = { 'LKOH', 'LKZ8', 'LKH9', 'LKM9', 'LKU9' },
+  VTBR  = { 'VTBR', 'VBZ8', 'VBH9', 'VBM9', 'VBU9' },
+  AFLT  = { 'AFLT', 'AFZ8', 'AFH9', 'AFM9', 'AFU9' },
+  MGNT  = { 'MGNT', 'MNZ8', 'MNH9', 'MNM9', 'MNU9' },
+  RTS   = {         'RIZ8', 'RIH9', 'RIM9', 'RIU9' }
 }
 
 StockSettings = inheritsFrom(Class, {
@@ -38,28 +38,36 @@ StockSettings = inheritsFrom(Class, {
 
     local futureSettings = {
       SBER = {
-        lotSize = 10
+        lotSize = 10,
+        comission = 2.6+0.6
       },
       SBERP =  {
-        lotSize = 10
+        lotSize = 10,
+        comission = 2.3+0.6
       },
       GAZP =  {
-        lotSize = 10
+        lotSize = 10,
+        comission = 2.15+0.6
       },
       VTBR =  {
-        lotSize = 10
+        lotSize = 10,
+        comission = 0.48+0.6
       },
       MGNT =  {
-        lotSize = 1
+        lotSize = 1,
+        comission = 0.48+0.6
       },
       AFLT =  {
-        lotSize = 10
+        lotSize = 10,
+        comission = 1.6+0.6
       },
       LKOH =  {
-        lotSize = 10
+        lotSize = 10,
+        comission = 6.4+0.6
       },
       RTS = {
-        lotSize = 1
+        lotSize = 1,
+        comission = 6.6+0.6
       }
     }
 

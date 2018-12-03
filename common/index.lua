@@ -1,3 +1,9 @@
+if getWorkingFolder ~= nil then
+  package.path = _app_path..'?.lua;'..'_packages\\?.lua;'.. package.path
+else
+  package.path = _app_path..'?.lua;'..'_packages//?.lua;'.. package.path
+end
+
 function inheritsFrom( baseClass, static )
   static = static or {}
   local new_class = {}
@@ -25,25 +31,7 @@ function Disposable:dispose()
   self.dispose(self)
 end
 
-Logs = Disposable.new({
-  new = function(self)
-    self.logFiles = {}
-  end,
-  Write = function(self, logName, msg)
-    local logFilePath = _app_path..'logs/'..logName..'_'..os.date('%x'):gsub('/', '-')..'.log'
-    local logFile = self.logFiles[logFilePath]
-    if logFile == nil then
-      logFile = io.open(logFilePath, "a+")
-      self.logFiles[logFilePath] = logFile
-    end
-
-    logFile:write(os.date('%X')..": ".. msg .. ";\n")
-    logFile:flush()
-  end,
-  dispose = function(self)
-    for i, v in ipairs(self.logFiles) do v:close() end
-  end
-})
+Logs = require("common/logs")
 
 --- Sleep that always works
 function delay(msec)
@@ -150,4 +138,5 @@ end
 DoFiles({
   { 'stock_settings.lua' },
   { 'external_connector', 'index.lua' },
+  { 'common', 'objects', 'index.lua' }
 })

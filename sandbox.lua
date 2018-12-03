@@ -12,27 +12,21 @@ function main1()
   local RedisInteraction = require('services/redis_interaction')
   local redis_interaction = RedisInteraction.new()
   local requestResult = redis_interaction.Request(indicator)
-  print(requestResult)
-  redis_interaction:addWatch(indicator, function(_indicator)
-    print('watch__'.._indicator:ToString())
+  redis_interaction:AddWatch(indicator, function(_indicator)
     return Indicator.new('Volumes', { key = 'response_'.._indicator.data.key })
   end)
-  redis_interaction:watch(indicator)
+  redis_interaction:Watch()
   requestResult = redis_interaction.Request(indicator)
-  print(table.tostring(requestResult))
-  print(table.tostring(indicator))
-
 end
 
-function main()
+function main2()
   local client = require('external_connector/index').redis
   local keys = client:keys('*')
   print(table.tostring(keys))
   print(client:get('QUIK:Indicator:Request:Volumes'))
 end
 
-if getScriptPath == nil then main1() end
-main()
---QUIK:Indicator:Request:*
---QUIK:Indicator:Request:Volumes
---QUIK:Indicator:Request:Volumes
+--if getScriptPath == nil then main1() end
+dt1 = DateTime.new({ sec = 29 })
+dt2 = DateTime.new({ sec = 30 })
+print(nil * 2)

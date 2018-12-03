@@ -38,8 +38,8 @@ end
 function Processor.resFunc(prevValue, curValue)
   local stock = prevValue.stock or {}
   local futures = prevValue.futures or {}
-  stock = { volume = stock.volume or 0, needSpent = stock.spent or 0 }
-  futures = { volume = futures.volume or 0, needSpent = futures.spent or 0 }
+  stock = { volume = stock.volume or 0, needSpent = stock.needSpent or 0 }
+  futures = { volume = futures.volume or 0, needSpent = futures.needSpent or 0 }
   stock.volume = stock.volume + curValue.stock.volume
   futures.volume = futures.volume + curValue.futures.volume
   local needSpentStock = table.average(curValue.stock.prices) * stock.volume

@@ -11,10 +11,9 @@ function trade.FromQuik(trade)
     value = trade.value,
     sec_code = trade.sec_code,
     class_code = trade.class_code,
-    date = trade.datetime.year * 10000 + trade.datetime.month * 100 + trade.datetime.day,
-    time = trade.datetime.hour * 10000000 + trade.datetime.min * 100000 + trade.datetime.sec * 1000 + trade.datetime.ms
+    datetime = DateTime.FromQuik(trade.datetime)
   }
-  _trade['datetime'] = _trade.date * 1000000000 + _trade.time
+
   return _trade
 end
 
@@ -22,9 +21,7 @@ function trade.FromString(str, date)
   local splitted = split(str, ';')
   local trade = {
     trade_num = tonumber(splitted[1]),
-    date = tonumber(date),
-    time = tonumber(splitted[2]),
-    datetime = tonumber(date..splitted[2]),
+    datetime = DateTime.FromStrings(date, splitted[2]),
     flags = tonumber(splitted[3]),
     price = tonumber(splitted[4]),
     qty = tonumber(splitted[5]),
