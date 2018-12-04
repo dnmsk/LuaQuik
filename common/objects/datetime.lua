@@ -82,6 +82,8 @@ function DateTime.Diff(dateTime1, dateTime2)
 end
 
 function DateTime:PeriodId(dateTimePeriod)
+  return dateTimePeriod:DateTimeNumber() * math.floor(self:DateTimeNumber() / dateTimePeriod:DateTimeNumber())
+--[[
   if dateTimePeriod.year > 0 then
     return dateTimePeriod.year * math.floor(self.year / dateTimePeriod.year) * 10000000000000
   end
@@ -114,4 +116,5 @@ function DateTime:PeriodId(dateTimePeriod)
       + self.sec * 1000
       + dateTimePeriod.ms * math.floor(self.ms / dateTimePeriod.ms)
   end
+]]
 end

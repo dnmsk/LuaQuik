@@ -26,7 +26,7 @@ function StockProcessor:SetProcessors(processors)
 end
 
 function StockProcessor:Calculate(date)
-  if date == nil then date = tonumber(os.date('%Y%m%d')) end
+  if date == nil then date = DateTime.Now() end
   for pi, pv in pairs(self.processors) do
     for ci, cv in pairs(self.codeGroups) do
       if pv.groups[ci] ~= nil then
@@ -35,7 +35,7 @@ function StockProcessor:Calculate(date)
           data = { data = {}, lastChecked = 0 }
           cv[pi] = data
         end
-        local minTime = math.floor(data.lastChecked - pv.period:DateTimeNumber() * 4)
+        local minTime = math.floor(data.lastChecked - pv.period:DateTimeNumber() * 3)
         for k, v in pairs(data.data) do
           if k >= minTime then
             data.data[k] = {}

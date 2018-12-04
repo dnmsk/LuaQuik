@@ -37,6 +37,7 @@ function Tables:Create()
 end
 
 function Tables:Update()
+  Logs:Write('Table', 'Tables:Update call')
   for ti, tv in pairs(self.tables) do
     local colVals = tv.vals[ci]
     local t_id = tv.id
@@ -47,7 +48,7 @@ function Tables:Update()
       end
       for ri, rv in ipairs(cv.values()) do
         local cellVal = colVals[ri]
-        if cellVal ~= rv.val then
+        if cellVal ~= rv.val or true then
           cellVal = rv.val
           colVals[ri] = cellVal
           local row = tv.rows[ri]

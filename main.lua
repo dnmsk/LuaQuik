@@ -52,20 +52,30 @@ function main()
 end
 
 function Sandbox()
+  local codesArray = {}
+  for k, v in pairs(StockCodes) do
+    for _, cv in ipairs(v) do codesArray[#codesArray+1] = cv end
+  end
+  local date = DateTime.FromStrings('20181128', '')
+  Logs:Write('Sandbox', 'Start')
+  Instances.AllTradesContainer:Init(codesArray, { date })
   OnInit()
+  Logs:Write('Sandbox', 'Init')
   Instances.StockProcessor:SetProcessors({
     Volumes = Instances.Processors:Get('volumes', {
       period = DateTime.new({ min = 1 }),
       groups = StockCodes,
     })
   })
-  Instances.StockProcessor:Calculate('20181128')
+  Instances.StockProcessor:Calculate(date)
+  Logs:Write('Sandbox', 'Calculate')
   local result = Instances.StockProcessor:Results('SBER')
+  Logs:Write('Sandbox', 'Results')
   local data = result.Volumes
   for k, v in ipairs(table.sortKeys(data)) do
     print(v..'='..table.tostring(data[v]))
   end
-  Logs:Write('test', os.date())
+  Logs:Write('Sandbox', 'Ends')
 end
 
 if getScriptPath == nil then Sandbox() end

@@ -9,16 +9,16 @@ AllTradesContainer = inheritsFrom(Disposable, {
 
 function AllTradesContainer:fileName(code, date)
   if date == nil then
-    date = os.date('%Y%m%d')
+    date = DateTime.Now()
   end
-  local outFilePostfix = '_'..date..'.csv'
+  local outFilePostfix = '_'..date:DateNumber()..'.csv'
   return _app_path..'trades/'..code..'_'..outFilePostfix
 end
 
 function AllTradesContainer:Init(codes, dates)
   self:dispose(self)
-  self.container = { buffer = {}, trades = {} }
-  if dates == nil then dates = { os.date('%Y%m%d') } end
+  --self.container = { buffer = {}, trades = {} }
+  if dates == nil then dates = { DateTime.Now() } end
   for i, v in ipairs(codes) do
     self.codes[v] = v
     for di, dv in ipairs(dates) do
@@ -27,7 +27,7 @@ function AllTradesContainer:Init(codes, dates)
         trades = {}
         self.container.trades[v] = trades
       end
-      trades[DateTime.FromStrings(dv, ''):DateNumber()] = self:ReadTradesForDate(v, dv)
+      trades[dv:DateNumber()] = self:ReadTradesForDate(v, dv)
     end
   end
 end
@@ -69,19 +69,20 @@ function AllTradesContainer:PushTrade(code, trade)
   end
 end
 
-function AllTradesContainer:Trades(code, date, keepInCache)
+function AllTradesContainer:Trades(code, date)
   local trades = self.container.trades[code]
   if date == nil then return trades end
   if trades == nil then
     self:Init({ code })
     trades = self.container.trades[code]
   end
-  trades = trades[tonumber(date)]
-  if trades == nil and keepInCache ~= nil then
+
+  trades = trades[date:DateNumber()]
+  if trades == nil then
     self:Init({ code }, { date })
-    trades = self.container.trades[code][DateTime.FromStrings(date, ''):DateNumber()]
-  else
-    trades = self:ReadTradesForDate(code, date)
+    trades = self.container.trades[code][date:DateNumber()]
+  --else
+  --  trades = self:ReadTradesForDate(code, date)
   end
   return trades
 end
@@ -98,7 +99,7 @@ function AllTradesContainer:FlushBuffer()
         for ti, tv in pairs(bv) do
           local trade = self.container.trades[i][bi][tv.trade_num]
           if trade['saved'] ~= true then
-            local fileName = self:fileName(v, trade.date)
+            local fileName = self:fileName(v, trade.datetime)
             local file = files[fileName]
             if file == nil then
               file = io.open(fileName, "a+")
