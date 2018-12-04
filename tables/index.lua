@@ -8,7 +8,7 @@ Tables = inheritsFrom(Disposable, {
 function Tables:Find(name)
   local tbl = self.tables[name]
   if tbl == nil then
-    tbl = { id = AllocTable(), rows = {} }
+    tbl = { id = AllocTable(), rows = {}, vals = {} }
     self.tables[name] = tbl
   end
   return tbl
@@ -38,18 +38,27 @@ end
 
 function Tables:Update()
   for ti, tv in pairs(self.tables) do
+    local colVals = tv.vals[ci]
     local t_id = tv.id
     for ci, cv in ipairs(tv.columns) do
+      if colVals == nil then
+        colVals = {}
+        tv.vals[ci] = colVals
+      end
       for ri, rv in ipairs(cv.values()) do
-        local row = tv.rows[ri]
-        if row == nil then
-          tv.rows[ri] = InsertRow(t_id, ri)
-        end
-        local val = rv.val
-        SetCell(t_id, ri, ci, tostring(val), val)
-        local color = rv.color
-        if color ~= nil then
-          SetColor(t_id, ri, ci, color, RGB(0,0,0), color, RGB(0,0,0))
+        local cellVal = colVals[ri]
+        if cellVal ~= rv.val then
+          cellVal = rv.val
+          colVals[ri] = cellVal
+          local row = tv.rows[ri]
+          if row == nil then
+            tv.rows[ri] = InsertRow(t_id, ri)
+          end
+          SetCell(t_id, ri, ci, tostring(cellVal), cellVal)
+          local color = rv.color
+          if color ~= nil then
+            SetColor(t_id, ri, ci, color, RGB(0,0,0), color, RGB(0,0,0))
+          end
         end
       end
     end

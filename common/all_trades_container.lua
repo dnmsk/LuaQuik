@@ -27,7 +27,7 @@ function AllTradesContainer:Init(codes, dates)
         trades = {}
         self.container.trades[v] = trades
       end
-      trades[tonumber(dv)] = self:ReadTradesForDate(v, dv)
+      trades[DateTime.FromStrings(dv, ''):DateNumber()] = self:ReadTradesForDate(v, dv)
     end
   end
 end
@@ -55,10 +55,10 @@ function AllTradesContainer:PushTrade(code, trade)
       buffer = {}
       v[code] = buffer
     end
-    local _buffer = buffer[_trade.date]
+    local _buffer = buffer[_trade.datetime:DateNumber()]
     if _buffer == nil then
       _buffer = {}
-      buffer[_trade.date] = _buffer
+      buffer[_trade.datetime:DateNumber()] = _buffer
     end
     if _buffer[_trade.trade_num] == nil then
       _buffer[_trade.trade_num] = _trade
@@ -79,7 +79,7 @@ function AllTradesContainer:Trades(code, date, keepInCache)
   trades = trades[tonumber(date)]
   if trades == nil and keepInCache ~= nil then
     self:Init({ code }, { date })
-    trades = self.container.trades[code][tonumber(date)]
+    trades = self.container.trades[code][DateTime.FromStrings(date, ''):DateNumber()]
   else
     trades = self:ReadTradesForDate(code, date)
   end

@@ -25,14 +25,13 @@ function trade.FromString(str, date)
     flags = tonumber(splitted[3]),
     price = tonumber(splitted[4]),
     qty = tonumber(splitted[5]),
-    value = tonumber(splitted[6]),
   }
-  trade['value'] = trade.qty * trade.price
+  trade.value = trade.qty * trade.price
   return trade
 end
 
 function trade.ToString(trade)
-  return trade.trade_num..';'..trade.time..';'..
+  return trade.trade_num..';'..trade.datetime:TimeNumber()..';'..
     trade.flags..';'..trade.price..';'..trade.qty
 end
 

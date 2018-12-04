@@ -11,6 +11,8 @@ DateTime = inheritsFrom(Class, {
 })
 
 function DateTime.FromNumbers(numberDate, numberTime)
+  numberDate = numberDate or 0
+  numberTime = numberTime or 0
   return DateTime.new({
     year   = math.floor(numberDate / 10000),
     month  = math.floor((numberDate % 10000) / 100),
@@ -34,10 +36,19 @@ function DateTime.FromStrings(dateString, timeString)
 end
 
 function DateTime.FromQuik(quikDateTime)
-  return DateTime.new(
-    quikDateTime.year, quikDateTime.month, quikDateTime.day,
-    quikDateTime.hour, quikDateTime.min, quikDateTime.sec, quikDateTime.ms
-  )
+  return DateTime.new({
+    year = quikDateTime.year,
+    month = quikDateTime.month,
+    day = quikDateTime.day,
+    hour = quikDateTime.hour,
+    min = quikDateTime.min,
+    sec = quikDateTime.sec,
+    ms = quikDateTime.ms
+  })
+end
+
+function DateTime.Now()
+  return DateTime.new(os.date('*t'))
 end
 
 function DateTime:DateNumber()
@@ -56,6 +67,18 @@ end
 
 function DateTime:DateTimeNumber()
   return self:DateNumber() * 1000000000 + self:TimeNumber()
+end
+
+function DateTime.Diff(dateTime1, dateTime2)
+  return DateTime.new({
+    year   = dateTime1.year - dateTime2.year,
+    month  = dateTime1.month - dateTime2.month,
+    day    = dateTime1.day - dateTime2.day,
+    hour   = dateTime1.hour - dateTime2.hour,
+    min    = dateTime1.min - dateTime2.min,
+    sec    = dateTime1.sec - dateTime2.sec,
+    ms     = dateTime1.ms - dateTime2.ms
+  }):DateTimeNumber()
 end
 
 function DateTime:PeriodId(dateTimePeriod)

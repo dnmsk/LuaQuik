@@ -41,12 +41,11 @@ function main()
   Instances.StockProcessor:Calculate()
   Instances.Tables:Create()
   while IsRun do
-    --connector.checkForConnection()
     loopIndex = loopIndex + 1
     if loopIndex > 60000 then loopIndex = 0 end
-    if loopIndex % 50 == 0 then Instances.ProcessInteraction:Watch() end
-    if loopIndex % 1000 == 0 then Instances.Tables:Update() end
-    if loopIndex % 2000 == 0 then Instances.StockProcessor:Calculate() end
+    if loopIndex % 10 == 0 then Instances.ProcessInteraction:Watch() end
+    if loopIndex % 500 == 0 then Instances.Tables:Update() end
+    if loopIndex % 1000 == 0 then Instances.StockProcessor:Calculate() end
     if loopIndex % 20000 == 0 then Instances.AllTradesContainer:FlushBuffer() end
     delay(1)
   end

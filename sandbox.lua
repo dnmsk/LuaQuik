@@ -27,6 +27,5 @@ function main2()
 end
 
 --if getScriptPath == nil then main1() end
-dt1 = DateTime.new({ sec = 29 })
 dt2 = DateTime.new({ sec = 30 })
-print(nil * 2)
+print(DateTime.Diff(dt2, DateTime.Now()))

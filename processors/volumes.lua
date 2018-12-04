@@ -61,7 +61,7 @@ function Processor.resFunc(prevValue, curValue)
     stock = stock,
     futures = futures,
     volume = stock.volume + futures.volume,
-    time = math.floor(curValue.time / 100000),
+    time = math.floor((curValue.time / 100000) % 10000),
     price = curValue.stock.prices[#curValue.stock.prices] or table.average(curValue.futures.prices)
   }
 end
