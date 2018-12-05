@@ -18,7 +18,8 @@ function OnInit(path)
   Instances.StockProcessor:Init(StockCodes)
   Instances.StockProcessor:SetProcessors({
     Volumes = Instances.Processors:Get('volumes', {
-      period = DateTime.new({ min = 1 }),
+      --period = DateTime.new({ min = 1 }),
+      period = DateTime.new(nil, '000100000'),
       groups = StockCodes,
     })
   })
@@ -44,7 +45,7 @@ function main()
     loopIndex = loopIndex + 1
     if loopIndex > 60000 then loopIndex = 0 end
     if loopIndex % 10 == 0 then Instances.ProcessInteraction:Watch() end
-    if loopIndex % 500 == 0 then Instances.Tables:Update() end
+    if loopIndex % 500 == 0 then Instances.Tables:Update(loopIndex % 5000 == 0) end
     if loopIndex % 1000 == 0 then Instances.StockProcessor:Calculate() end
     if loopIndex % 20000 == 0 then Instances.AllTradesContainer:FlushBuffer() end
     delay(1)
@@ -63,7 +64,7 @@ function Sandbox()
   Logs:Write('Sandbox', 'Init')
   Instances.StockProcessor:SetProcessors({
     Volumes = Instances.Processors:Get('volumes', {
-      period = DateTime.new({ min = 1 }),
+      period = DateTime.new(nil, '000100000'),
       groups = StockCodes,
     })
   })

@@ -8,7 +8,7 @@ Tables = inheritsFrom(Disposable, {
 function Tables:Find(name)
   local tbl = self.tables[name]
   if tbl == nil then
-    tbl = { id = AllocTable(), rows = {}, vals = {} }
+    tbl = { id = AllocTable(), rows = {} }
     self.tables[name] = tbl
   end
   return tbl
@@ -36,21 +36,15 @@ function Tables:Create()
   end
 end
 
-function Tables:Update()
+function Tables:Update(force)
   Logs:Write('Table', 'Tables:Update call')
   for ti, tv in pairs(self.tables) do
-    local colVals = tv.vals[ci]
     local t_id = tv.id
     for ci, cv in ipairs(tv.columns) do
-      if colVals == nil then
-        colVals = {}
-        tv.vals[ci] = colVals
-      end
-      for ri, rv in ipairs(cv.values()) do
-        local cellVal = colVals[ri]
-        if cellVal ~= rv.val or true then
-          cellVal = rv.val
-          colVals[ri] = cellVal
+      local values = cv.values()
+      for ri, rv in ipairs(values) do
+        if true or ri > (#values - 5) then
+          local cellVal = rv.val
           local row = tv.rows[ri]
           if row == nil then
             tv.rows[ri] = InsertRow(t_id, ri)

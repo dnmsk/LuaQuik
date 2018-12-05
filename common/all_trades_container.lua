@@ -7,11 +7,11 @@ AllTradesContainer = inheritsFrom(Disposable, {
   end
 }).new()
 
-function AllTradesContainer:fileName(code, date)
-  if date == nil then
-    date = DateTime.Now()
+function AllTradesContainer:fileName(code, dateString)
+  if dateString == nil then
+    dateString = DateTime.Now():DateNumber()
   end
-  local outFilePostfix = '_'..date:DateNumber()..'.csv'
+  local outFilePostfix = '_'..dateString..'.csv'
   return _app_path..'trades/'..code..'_'..outFilePostfix
 end
 
@@ -27,7 +27,7 @@ function AllTradesContainer:Init(codes, dates)
         trades = {}
         self.container.trades[v] = trades
       end
-      trades[dv:DateNumber()] = self:ReadTradesForDate(v, dv)
+      trades[dv:DateNumber()] = self:ReadTradesForDate(v, dv:DateNumber())
     end
   end
 end
@@ -99,7 +99,7 @@ function AllTradesContainer:FlushBuffer()
         for ti, tv in pairs(bv) do
           local trade = self.container.trades[i][bi][tv.trade_num]
           if trade['saved'] ~= true then
-            local fileName = self:fileName(v, trade.datetime)
+            local fileName = self:fileName(v, trade.datetime:DateNumber())
             local file = files[fileName]
             if file == nil then
               file = io.open(fileName, "a+")

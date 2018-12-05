@@ -1,5 +1,9 @@
 DateTime = inheritsFrom(Class, {
-  new = function(self, hash)
+  new = function(self, stringDate, stringTime)
+  --print('table..'..stringDate)
+    self.stringDate  = stringDate or '00000000'
+    self.stringTime = stringTime or '000000000'
+  --[[
     self.year   = hash.year or 0
     self.month  = hash.month or 0
     self.day    = hash.day or 0
@@ -7,12 +11,15 @@ DateTime = inheritsFrom(Class, {
     self.min    = hash.min or 0
     self.sec    = hash.sec or 0
     self.ms     = hash.ms or 0
+  --]]
   end
 })
 
 function DateTime.FromNumbers(numberDate, numberTime)
-  numberDate = numberDate or 0
-  numberTime = numberTime or 0
+  numberDate = numberDate or '00000000'
+  numberTime = numberTime or '000000000'
+  return DateTime.new(numberDate..'', numberTime..'')
+  --[[
   return DateTime.new({
     year   = math.floor(numberDate / 10000),
     month  = math.floor((numberDate % 10000) / 100),
@@ -22,6 +29,7 @@ function DateTime.FromNumbers(numberDate, numberTime)
     sec    = math.floor((numberTime % 100000) / 1000),
     ms     = math.floor(numberTime % 1000)
   })
+  ]]
 end
 
 function DateTime.FromNumber(numberDateTime)
@@ -32,10 +40,30 @@ function DateTime.FromNumber(numberDateTime)
 end
 
 function DateTime.FromStrings(dateString, timeString)
-  return DateTime.FromNumbers(tonumber(dateString), tonumber(timeString))
+  --return DateTime.FromNumbers(tonumber(dateString), tonumber(timeString))
+  return DateTime.new(dateString, timeString)
 end
 
 function DateTime.FromQuik(quikDateTime)
+  local month = quikDateTime.month
+  local day = quikDateTime.day
+  local hour = quikDateTime.hour
+  local min = quikDateTime.min
+  local sec = quikDateTime.sec or 0
+  local ms = quikDateTime.ms or 0
+  if month < 10 then month = '0'..month end
+  if day < 10 then day = '0'..day end
+  if hour < 10 then hour = '0'..hour end
+  if min < 10 then min = '0'..min end
+  if sec < 10 then sec = '0'..sec end
+  if ms < 100 then
+    if ms < 10 then ms = '00'..ms else ms = '0'..ms  end
+  end
+  return DateTime.new(
+    quikDateTime.year..month..day,
+    hour..min..sec..ms
+  )
+  --[[
   return DateTime.new({
     year = quikDateTime.year,
     month = quikDateTime.month,
@@ -45,28 +73,32 @@ function DateTime.FromQuik(quikDateTime)
     sec = quikDateTime.sec,
     ms = quikDateTime.ms
   })
+  ]]
 end
 
 function DateTime.Now()
-  return DateTime.new(os.date('*t'))
+  return DateTime.FromQuik(os.date('*t'))
 end
 
 function DateTime:DateNumber()
-  if self._dateNumber == nil then
-    self._dateNumber = self.year * 10000 + self.month * 100 + self.day
-  end
-  return self._dateNumber
+  return tonumber(self.stringDate)
+--  if self._dateNumber == nil then
+--    self._dateNumber = self.year * 10000 + self.month * 100 + self.day
+--  end
+--  return self._dateNumber
 end
 
 function DateTime:TimeNumber()
-  if self._timeNumber == nil then
-    self._timeNumber = self.hour * 10000000 + self.min * 100000 + self.sec * 1000 + self.ms
-  end
-  return self._timeNumber
+  return tonumber(self.stringTime)
+--  if self._timeNumber == nil then
+--    self._timeNumber = self.hour * 10000000 + self.min * 100000 + self.sec * 1000 + self.ms
+--  end
+--  return self._timeNumber
 end
 
 function DateTime:DateTimeNumber()
-  return self:DateNumber() * 1000000000 + self:TimeNumber()
+  return tonumber(self.stringDate..self.stringTime)
+--  return self:DateNumber() * 1000000000 + self:TimeNumber()
 end
 
 function DateTime.Diff(dateTime1, dateTime2)
