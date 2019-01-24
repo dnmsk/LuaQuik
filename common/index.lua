@@ -99,7 +99,7 @@ function table.sortKeys(tbl)
 end
 
 function table.average(tbl)
-  if #tbl == 0 then return 0 end
+  if tbl == nil or #tbl == 0 then return 0 end
   local sum = 0
   for i in ipairs(tbl) do
     sum = sum + tbl[i]

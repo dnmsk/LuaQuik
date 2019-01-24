@@ -6,13 +6,17 @@ if isQuik() then
   script_path = _app_path
   package.loadlib(_app_path .. "\\clibs\\lua51.dll", "main")
   package.path = package.path .. ";" .. script_path .. "\\?.lua;" .. script_path .. "\\?.luac"..";"..".\\?.lua;"..".\\?.luac"
-  package.cpath = package.cpath .. ";" .. script_path .. '\\clibs\\?.dll'..";"..'.\\clibs\\?.dll'
+  package.cpath = package.cpath .. ";" .. script_path .. '\\clibs\\?.dll'..";"..'.\\clibs\\?.dll'..";"..'.\\clibs\\mime\\?.dll'
 end
 
 local redis = require('_packages/redis')
+local http = require('socket.http')
+
+http.TIMEOUT = 0.6
 
 local externalConnector = {
-  redis = redis.connect('127.0.0.1', 6379)
+  redis = redis.connect('127.0.0.1', 6379),
+  http = http
 }
 
 return externalConnector

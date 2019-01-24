@@ -14,9 +14,9 @@ function Tables:Find(name)
   return tbl
 end
 
-function Tables:Append(name, columns, conf)
+function Tables:Append(name, columns, resultGetter, conf)
   if self.tables.name == nil then
-    self.needCreate[name] = { columns = columns, conf = conf or {} }
+    self.needCreate[name] = { columns = columns, resultGetter = resultGetter, conf = conf or {} }
   end
 end
 
@@ -27,6 +27,7 @@ function Tables:Create()
   for k, v in pairs(tbls) do
     local tbl = self:Find(k)
     tbl.columns = v.columns
+    tbl.resultGetter = v.resultGetter
     for i, v in ipairs(v.columns) do
       local colId = AddColumn(tbl.id, i, v.name, v.default, v.type, v.width)
     end
@@ -40,23 +41,39 @@ function Tables:Update(force)
   Logs:Write('Table', 'Tables:Update call')
   for ti, tv in pairs(self.tables) do
     local t_id = tv.id
-    for ci, cv in ipairs(tv.columns) do
-      local values = cv.values()
-      for ri, rv in ipairs(values) do
-        if true or ri > (#values - 5) then
-          local cellVal = rv.val
-          local row = tv.rows[ri]
-          if row == nil then
-            tv.rows[ri] = InsertRow(t_id, ri)
+    pcall(
+      function()
+        local results = tv.resultGetter()
+        local prevResults = tv.prevResults or {}
+        for ci, cv in ipairs(tv.columns) do
+          local values = cv.values(results)
+          local colPrevResult = prevResults[ci]
+          if colPrevResult == nil then
+            colPrevResult = {}
+            prevResults[ci] = colPrevResult
           end
-          SetCell(t_id, ri, ci, tostring(cellVal), cellVal)
-          local color = rv.color
-          if color ~= nil then
-            SetColor(t_id, ri, ci, color, RGB(0,0,0), color, RGB(0,0,0))
+
+          for ri, rv in ipairs(values) do
+            local cellPrevResult = colPrevResult[ri] or ''
+            local cellVal = rv.val
+
+            if force or cellVal ~= cellPrevResult then
+              colPrevResult[ri] = rv.val
+              local row = tv.rows[ri]
+              if row == nil then
+                tv.rows[ri] = InsertRow(t_id, ri)
+              end
+              SetCell(t_id, ri, ci, tostring(cellVal), cellVal)
+              local color = rv.color
+              if color ~= nil then
+                SetColor(t_id, ri, ci, color, RGB(0,0,0), color, RGB(0,0,0))
+              end
+            end
           end
         end
+        tv.prevResults = prevResults
       end
-    end
+    )
   end
 end
 

@@ -38,6 +38,7 @@ end
 function Processor.resFunc(prevValue, curValue)
   local stock = prevValue.stock or {}
   local futures = prevValue.futures or {}
+  curValue = curValue or { stock = stock, futures = futures }
   stock = { volume = stock.volume or 0, needSpent = stock.needSpent or 0 }
   futures = { volume = futures.volume or 0, needSpent = futures.needSpent or 0 }
   stock.volume = stock.volume + curValue.stock.volume
@@ -53,16 +54,23 @@ function Processor.resFunc(prevValue, curValue)
   local needSpent = math.floor(needSpentStock + needSpentFutures)
   stock.needSpent = needSpentStock
   futures.needSpent = needSpentFutures
-  local volume = (prevValue.volume or 0) + curValue.stock.volume + curValue.futures.volume
   local spent = math.floor((prevValue.spent or 0) + curValue.stock.spent + curValue.futures.spent)
+  local volume = stock.volume + futures.volume
+  if volume == 0 then volume = 1 end
+  local price = math.floor(
+      10 * (
+        curValue.stock.prices[#curValue.stock.prices] or table.average(curValue.futures.prices)
+      )
+    ) / 100
   return {
     spent = spent,
     moneyDelta = needSpent - spent,
     stock = stock,
     futures = futures,
-    volume = stock.volume + futures.volume,
+    volume = volume,
     time = math.floor((curValue.time / 100000) % 10000),
-    price = curValue.stock.prices[#curValue.stock.prices] or table.average(curValue.futures.prices)
+    avgPrice = -math.floor(10 * (needSpent - spent)/volume) / 100,
+    price = price
   }
 end
 

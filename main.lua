@@ -13,28 +13,34 @@ function OnInit(path)
   for k, v in pairs(StockCodes) do
     for _, cv in ipairs(v) do codesArray[#codesArray+1] = cv end
   end
-  Instances.AllTradesContainer:Init(codesArray)
+  --Instances.AllTradesContainer:Init(codesArray)
 
-  Instances.StockProcessor:Init(StockCodes)
+  --Instances.StockProcessor:Init(StockCodes)
+  --[==[
   Instances.StockProcessor:SetProcessors({
     Volumes = Instances.Processors:Get('volumes', {
       --period = DateTime.new({ min = 1 }),
       period = DateTime.new(nil, '000100000'),
-      groups = StockCodes,
+      groups = {
+        SBER = StockCodes.SBER,
+        RTS = StockCodes.RTS,
+        LKOH = StockCodes.LKOH
+      },
     })
   })
+  --]==]
   IsRun = true
 end
 
 function OnStop(signal)
   IsRun = false
   Instances.Tables:dispose()
-  Instances.AllTradesContainer:dispose()
+  --Instances.AllTradesContainer:dispose()
   Logs:dispose()
 end
 
 function OnAllTrade(alltrade)
-  Instances.AllTradesContainer:PushTrade(alltrade.sec_code, alltrade)
+  --Instances.AllTradesContainer:PushTrade(alltrade.sec_code, alltrade)
 end
 
 function main()
@@ -44,10 +50,10 @@ function main()
   while IsRun do
     loopIndex = loopIndex + 1
     if loopIndex > 60000 then loopIndex = 0 end
-    if loopIndex % 10 == 0 then Instances.ProcessInteraction:Watch() end
-    if loopIndex % 500 == 0 then Instances.Tables:Update(loopIndex % 5000 == 0) end
-    if loopIndex % 1000 == 0 then Instances.StockProcessor:Calculate() end
-    if loopIndex % 20000 == 0 then Instances.AllTradesContainer:FlushBuffer() end
+    --if loopIndex % 10 == 0 then Instances.ProcessInteraction:Watch() end
+    if loopIndex % 500 == 0 then Instances.Tables:Update(loopIndex % 1000000 == 0) end
+    --if loopIndex % 1000 == 0 then Instances.StockProcessor:Calculate() end
+    --if loopIndex % 20000 == 0 then Instances.AllTradesContainer:FlushBuffer() end
     delay(1)
   end
 end

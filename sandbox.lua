@@ -6,6 +6,17 @@ else
   dofile(_app_path..'common/index.lua')
 end
 
+local json = require (_app_path..'dkjson')
+
+function main()
+  local client = require('external_connector/index').http
+  local body, code, header = client.request('http://192.168.0.75:82/grouped_data/volumes?seccode=sber')
+  print(body)
+  print(code)
+  print(table.tostring(header))
+  print(table.tostring(json.decode(body, 1, nil)['Aggregate']))
+end
+
 function main1()
   local Indicator = require('common/objects/indicator')
   local indicator = Indicator.new('Volumes', { key = 'value11' })
@@ -27,5 +38,7 @@ function main2()
 end
 
 --if getScriptPath == nil then main1() end
-dt2 = DateTime.new({ sec = 30 })
-print(DateTime.Diff(dt2, DateTime.Now()))
+
+--main()
+local p = {}
+print(p[''])
